@@ -54,7 +54,7 @@ To install and run the Spanish Postal Codes API on your local machine or server,
 1. Clone the repository:
    
     ```
-    git clone https://github.com/your/repository.git
+    git clone https://github.com/codecruz/spain-postal-codes.git
     ```
 2. Install dependencies using Composer:
     ```
