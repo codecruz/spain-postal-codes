@@ -89,3 +89,11 @@ Contributions to the Spanish Postal Codes API are welcome! If you'd like to cont
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). You are free to use, modify, and distribute this software as permitted by the license. See the `LICENSE` file for more details.
+
+---
+
+If you find any missing data in the file [es_cp.csv](https://github.com/codecruz/spain-postal-codes/blob/main/data/es_cp.csv), I would appreciate any contributions and pull requests.
+
+If this project or the information within it has been helpful to you, please give it a star (⭐)!
+
+Thank you for your support!
