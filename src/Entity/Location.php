@@ -22,11 +22,6 @@ class Location
     #[ORM\Column]
     private ?float $cod_postal = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $latitud = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $longitud = null;
 
     public function getId(): ?int
     {
@@ -69,27 +64,4 @@ class Location
         return $this;
     }
 
-    public function getLatitud(): ?string
-    {
-        return $this->latitud;
-    }
-
-    public function setLatitud(string $latitud): static
-    {
-        $this->latitud = $latitud;
-
-        return $this;
-    }
-
-    public function getLongitud(): ?string
-    {
-        return $this->longitud;
-    }
-
-    public function setLongitud(string $longitud): static
-    {
-        $this->longitud = $longitud;
-
-        return $this;
-    }
 }
