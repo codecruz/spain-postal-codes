@@ -1,21 +1,2 @@
-
-###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
-/vendor/
-###< symfony/framework-bundle ###
-
-###> phpunit/phpunit ###
-/phpunit.xml
-/.phpunit.cache/
-###< phpunit/phpunit ###
-
 /site/
-
-###> symfony/framework-bundle (generated config reference) ###
-/config/reference.php
-###< symfony/framework-bundle ###
+__pycache__/
