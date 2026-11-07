@@ -6,6 +6,11 @@ framework:
     # Stateless JSON API: no sessions, no cookies.
     session: false
 
+    # 4xx responses are client errors, not application errors: keep them out of the error log.
+    exceptions:
+        Symfony\Component\HttpKernel\Exception\HttpException:
+            log_level: info
+
     #esi: true
     #fragments: true
 
