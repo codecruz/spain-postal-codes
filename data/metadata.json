@@ -1,0 +1,81 @@
+{
+  "source": {
+    "name": "INE - Callejero del Censo Electoral",
+    "url": "https://www.ine.es/dyngs/DAB/es/index.htm?cid=1390",
+    "period": "2026-07",
+    "reference_date": "2026-06-30"
+  },
+  "license": "CC BY 4.0",
+  "attribution": "Fuente: Instituto Nacional de Estadística (INE). Callejero del Censo Electoral y Relación de municipios.",
+  "counts": {
+    "rows": 13979,
+    "postal_codes": 10791,
+    "municipalities": 8132,
+    "provinces": 52
+  },
+  "discarded": [
+    {
+      "cod_postal": "03020",
+      "municipio_id": "30021",
+      "municipio": "Fuente Álamo de Murcia",
+      "segments": 1,
+      "reason": "code from another province in fewer than 2 street segments (probable typo)"
+    },
+    {
+      "cod_postal": "04723",
+      "municipio_id": "47082",
+      "municipio": "Matapozuelos",
+      "segments": 1,
+      "reason": "code from another province in fewer than 2 street segments (probable typo)"
+    },
+    {
+      "cod_postal": "10000",
+      "municipio_id": "10037",
+      "municipio": "Cáceres",
+      "segments": 10,
+      "reason": "placeholder code (xx000 is not assigned to delivery addresses)"
+    },
+    {
+      "cod_postal": "13500",
+      "municipio_id": "10132",
+      "municipio": "Navalvillar de Ibor",
+      "segments": 1,
+      "reason": "code from another province in fewer than 2 street segments (probable typo)"
+    },
+    {
+      "cod_postal": "20251",
+      "municipio_id": "10011",
+      "municipio": "Aldeacentenera",
+      "segments": 1,
+      "reason": "code from another province in fewer than 2 street segments (probable typo)"
+    },
+    {
+      "cod_postal": "28000",
+      "municipio_id": "28079",
+      "municipio": "Madrid",
+      "segments": 1,
+      "reason": "placeholder code (xx000 is not assigned to delivery addresses)"
+    },
+    {
+      "cod_postal": "35000",
+      "municipio_id": "35011",
+      "municipio": "Ingenio",
+      "segments": 3,
+      "reason": "placeholder code (xx000 is not assigned to delivery addresses)"
+    },
+    {
+      "cod_postal": "35000",
+      "municipio_id": "35032",
+      "municipio": "Valleseco",
+      "segments": 1,
+      "reason": "placeholder code (xx000 is not assigned to delivery addresses)"
+    },
+    {
+      "cod_postal": "56662",
+      "municipio_id": "45006",
+      "municipio": "Alcaudete de la Jara",
+      "segments": 1,
+      "reason": "code from another province in fewer than 2 street segments (probable typo)"
+    }
+  ]
+}
