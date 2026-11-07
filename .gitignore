@@ -15,3 +15,7 @@
 ###< phpunit/phpunit ###
 
 /site/
+
+###> symfony/framework-bundle (generated config reference) ###
+/config/reference.php
+###< symfony/framework-bundle ###

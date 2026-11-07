@@ -102,7 +102,7 @@ The repository root also holds a self-hosted REST API built with Symfony 7.4 and
 
 ```bash
 composer install
-composer db:setup                  # SQLite by default: creates the DB and imports data/es_cp.csv
+composer db:setup                  # SQLite by default: runs the migrations and imports data/es_cp.csv
 php -S localhost:8000 -t public
 curl "http://localhost:8000/api/locations?provincia=sevilla&q=hermanas"
 ```
