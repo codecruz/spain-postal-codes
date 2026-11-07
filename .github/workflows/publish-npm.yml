@@ -1,0 +1,35 @@
+name: Publish npm package
+
+# Publish by creating a GitHub release whose tag is "npm-v<version>",
+# matching "version" in packages/npm/package.json.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+jobs:
+  publish:
+    if: startsWith(github.event.release.tag_name, 'npm-v')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/npm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check tag matches package version
+        run: |
+          version="$(node -p 'require("./package.json").version')"
+          test "${{ github.event.release.tag_name }}" = "npm-v${version}" || { echo "Tag does not match version ${version}"; exit 1; }
+
+      - run: npm test
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

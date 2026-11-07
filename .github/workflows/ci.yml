@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dataset:
+    name: Dataset & static API (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: python -m unittest discover -s scripts -v
+      - name: Build the static API from the committed dataset
+        run: python scripts/build_site.py --out site
+
+  npm:
+    name: npm package (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22']
+    defaults:
+      run:
+        working-directory: packages/npm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+      - run: npm pack --dry-run
+
+  symfony:
+    name: Symfony demo API (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ctype, iconv, mbstring, pdo_sqlite
+          coverage: none
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - uses: ramsey/composer-install@v3
+
+      - name: Lint container, YAML and Doctrine mapping
+        run: |
+          php bin/console lint:container
+          php bin/console lint:yaml config public/openapi.yaml --parse-tags
+          php bin/console doctrine:schema:validate --skip-sync
+
+      - name: Set up database and import dataset
+        run: composer db:setup
+
+      - name: Run tests
+        run: vendor/bin/phpunit

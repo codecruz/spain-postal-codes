@@ -1,122 +1,99 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Data\Province;
+use App\Http\ApiResponse;
+use App\Repository\LocationRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Location;
+use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Attribute\Route;
 
-
-#[Route('/api', name: 'api_')]
-class LocationController extends AbstractController
+#[AsController]
+#[Route('/api/locations', name: 'api_locations_')]
+final class LocationController
 {
-    #[Route('/locations', name: 'location_index', methods: ['get'])]
-    public function index(EntityManagerInterface $entityManager): JsonResponse
+    private const DEFAULT_LIMIT = 50;
+    private const MAX_LIMIT = 500;
+
+    public function __construct(private readonly LocationRepository $locations)
     {
-
-        $locations = $entityManager
-            ->getRepository(Location::class)
-            ->findAll();
-
-        $data = [];
-
-        foreach ($locations as $location) {
-            $data[] = [
-                'id' => $location->getId(),
-                'provincia' => $location->getProvincia(),
-                'poblacion' => $location->getPoblacion(),
-                'cod_postal' => $location->getCodPostal(),
-            ];
-        }
-
-        return $this->json($data);
     }
 
-
-
-    #[Route('/locations/{codPostal}', name: 'locations_show_by_codpostal', methods: ['GET'])]
-    public function showByCodPostal(string $codPostal): JsonResponse
+    /**
+     * Paginated list of locations, optionally filtered by province and town name.
+     */
+    #[Route('', name: 'index', methods: ['GET'])]
+    public function index(Request $request): JsonResponse
     {
-        $csvFile = __DIR__ . '/../../data/es_cp.csv'; // Ruta al CSV
-
-        if (!file_exists($csvFile)) {
-            return $this->json('Archivo CSV no encontrado', 500);
+        $page = $this->positiveInt($request, 'page', 1);
+        $limit = $this->positiveInt($request, 'limit', self::DEFAULT_LIMIT);
+        if ($limit > self::MAX_LIMIT) {
+            throw new BadRequestHttpException(\sprintf('Query parameter "limit" must not exceed %d.', self::MAX_LIMIT));
         }
 
-        $handle = fopen($csvFile, 'r');
-        if ($handle === false) {
-            return $this->json('No se pudo abrir el archivo CSV', 500);
+        $provincia = null;
+        $rawProvincia = trim($request->query->getString('provincia'));
+        if ('' !== $rawProvincia) {
+            $provincia = Province::resolve($rawProvincia)
+                ?? throw new BadRequestHttpException(\sprintf('Unknown province "%s". Use a province code (e.g. "28") or name (e.g. "Madrid").', $rawProvincia));
         }
 
-        $header = fgetcsv($handle, 0, ';'); // Leer cabecera con separador correcto
-        $data = [];
-
-        while (($row = fgetcsv($handle, 0, ';')) !== false) {
-            $rowData = array_combine($header, $row);
-            if (isset($rowData['cod_postal']) && $rowData['cod_postal'] === $codPostal) {
-                $data[] = [
-                    'provincia' => $rowData['provincia'],
-                    'poblacion' => $rowData['poblacion'],
-                    'cod_postal' => $rowData['cod_postal'],
-                ];
-            }
-        }
-        fclose($handle);
-
-        if (empty($data)) {
-            return $this->json('No locations found for cod postal ' . $codPostal, 404);
+        $search = trim($request->query->getString('q'));
+        if ('' !== $search && mb_strlen($search) < 2) {
+            throw new BadRequestHttpException('Query parameter "q" must be at least 2 characters long.');
         }
 
-        return $this->json($data);
+        $result = $this->locations->paginate($provincia, '' === $search ? null : $search, $page, $limit);
+
+        return ApiResponse::data($result['items'], [
+            'page' => $page,
+            'limit' => $limit,
+            'total' => $result['total'],
+            'pages' => (int) ceil($result['total'] / $limit),
+        ]);
     }
 
-    #[Route('/migrate-csv', name: 'locations_migrate_csv', methods: ['POST', 'GET'])]
-    public function migrateCsvToDb(EntityManagerInterface $entityManager): JsonResponse
+    /**
+     * All towns served by a postal code.
+     */
+    #[Route('/{codPostal}', name: 'show', methods: ['GET'])]
+    public function show(string $codPostal): JsonResponse
     {
-        $csvFile = __DIR__ . '/../../data/es_cp.csv';
-
-        if (!file_exists($csvFile)) {
-            return $this->json('Archivo CSV no encontrado', 500);
+        // Accept codes whose leading zero was dropped (e.g. "1450" for "01450").
+        if (1 === preg_match('/^\d{4}$/', $codPostal)) {
+            $codPostal = '0'.$codPostal;
         }
 
-        $handle = fopen($csvFile, 'r');
-        if ($handle === false) {
-            return $this->json('No se pudo abrir el archivo CSV', 500);
+        if (1 !== preg_match('/^\d{5}$/', $codPostal)) {
+            throw new BadRequestHttpException(\sprintf('Invalid postal code "%s": it must have 5 digits.', $codPostal));
         }
 
-        $header = fgetcsv($handle, 0, ';');
-        $count = 0;
-
-        while (($row = fgetcsv($handle, 0, ';')) !== false) {
-            $rowData = array_combine($header, $row);
-            if (!$rowData || !isset($rowData['provincia'], $rowData['poblacion'], $rowData['cod_postal'])) {
-                continue;
-            }
-            // Evitar duplicados por cod_postal y poblacion
-            $existing = $entityManager->getRepository(Location::class)->findOneBy([
-                'cod_postal' => $rowData['cod_postal'],
-                'poblacion' => $rowData['poblacion'],
-            ]);
-            if ($existing) {
-                continue;
-            }
-
-            $location = new Location();
-            $location->setProvincia($rowData['provincia']);
-            $location->setPoblacion($rowData['poblacion']);
-            $location->setCodPostal($rowData['cod_postal']);
-
-            $entityManager->persist($location);
-            $count++;
+        $locations = $this->locations->findByCodPostal($codPostal);
+        if ([] === $locations) {
+            throw new NotFoundHttpException(\sprintf('No locations found for postal code %s.', $codPostal));
         }
-        fclose($handle);
 
-        $entityManager->flush();
-
-        return $this->json(['migrated' => $count]);
+        return ApiResponse::data($locations);
     }
 
+    private function positiveInt(Request $request, string $name, int $default): int
+    {
+        $raw = $request->query->getString($name);
+        if ('' === $raw) {
+            return $default;
+        }
+
+        $value = filter_var($raw, \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if (false === $value) {
+            throw new BadRequestHttpException(\sprintf('Query parameter "%s" must be a positive integer.', $name));
+        }
+
+        return $value;
+    }
 }
