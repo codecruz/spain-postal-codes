@@ -13,8 +13,7 @@ Outputs (in data/):
 
 * codigos_postales.csv  cod_postal,municipio_id,municipio,provincia_id,provincia
 * provincias.csv        provincia_id,provincia
-* es_cp.csv             provincia;poblacion;cod_postal (legacy format used by the Symfony API)
-* metadata.json         source period, counts and attribution
+* metadata.json         source period, counts, attribution and discarded pairs
 
 Only the Python standard library is used. Usage:
 
@@ -252,12 +251,6 @@ def write_outputs(rows: list[Row], discarded: list[dict], period: str, out_dir: 
         writer = csv.writer(f, lineterminator="\n")
         writer.writerow(["provincia_id", "provincia"])
         writer.writerows(PROVINCES.items())
-
-    legacy = sorted({(r.provincia_id, r.provincia, r.municipio, r.cod_postal) for r in rows})
-    with open(out_dir / "es_cp.csv", "w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f, delimiter=";", lineterminator="\n")
-        writer.writerow(["provincia", "poblacion", "cod_postal"])
-        writer.writerows((provincia, municipio, cod_postal) for _, provincia, municipio, cod_postal in legacy)
 
     month, year = period[:2], period[2:]
     reference = f"{year}-06-30" if month == "07" else f"{int(year) - 1}-12-31"

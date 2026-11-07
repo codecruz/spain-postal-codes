@@ -108,8 +108,7 @@ class OutputsTest(unittest.TestCase):
     def test_dataset_files(self):
         with open(self.out / "data" / "codigos_postales.csv", encoding="utf-8") as f:
             self.assertEqual("28079", list(csv.DictReader(f))[1]["municipio_id"])
-        legacy = (self.out / "data" / "es_cp.csv").read_text(encoding="utf-8").splitlines()
-        self.assertEqual(["provincia;poblacion;cod_postal", "Burgos;Burgos;09001", "Madrid;Alcobendas;28100", "Madrid;Madrid;28001"], legacy)
+        self.assertFalse((self.out / "data" / "es_cp.csv").exists())
         self.assertEqual({"rows": 3, "postal_codes": 3, "municipalities": 3, "provinces": 2}, self.metadata["counts"])
         self.assertEqual("2026-06-30", self.metadata["source"]["reference_date"])
 
