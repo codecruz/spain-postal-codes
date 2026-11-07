@@ -5,13 +5,14 @@
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 
-An open, versioned dataset of **Spanish postal codes and the municipalities they serve**. It is built from official INE data and kept up to date automatically. You can use it in three ways:
+An open, versioned dataset of **Spanish postal codes and the municipalities they serve**. It is built from official INE data and kept up to date automatically. You can use it in four ways:
 
 | | |
 |---|---|
 | 📄 **Dataset** | [`data/codigos_postales.csv`](data/codigos_postales.csv): download it and use it anywhere |
 | 🌐 **Static JSON API** | [`codecruz.github.io/spain-postal-codes`](https://codecruz.github.io/spain-postal-codes/): no server, no API key, open CORS |
 | 📦 **npm package** | [`spain-postal-codes`](packages/npm): offline lookup and search, zero dependencies, ~110 KB gzipped |
+| 🐘 **PHP library** | [`codecruz/spain-postal-codes`](https://github.com/codecruz/spain-postal-codes-php): the same API for PHP 8.1+, via Composer |
 
 **10,791 postal codes · 8,132 municipalities · 52 provinces**. The current data refers to 30 June 2026.
 
@@ -39,7 +40,6 @@ Why not Correos or CartoCiudad? Correos owns the intellectual property of its po
 | [`data/codigos_postales.csv`](data/codigos_postales.csv) | `cod_postal,municipio_id,municipio,provincia_id,provincia`: one row per (postal code, municipality) pair |
 | [`data/provincias.csv`](data/provincias.csv) | `provincia_id,provincia` |
 | [`data/metadata.json`](data/metadata.json) | Source period, reference date, counts, attribution and discarded pairs |
-| [`data/es_cp.csv`](data/es_cp.csv) | Legacy format (`provincia;poblacion;cod_postal`) used by the Symfony demo |
 
 ```csv
 cod_postal,municipio_id,municipio,provincia_id,provincia
@@ -96,22 +96,21 @@ searchMunicipios("alcala");    // case- and accent-insensitive
 
 See the [package README](packages/npm/README.md) for the full API.
 
-## Symfony demo API
-
-The repository root also holds a self-hosted REST API built with Symfony 7.4 and Doctrine. It offers pagination, filters, JSON errors and an [OpenAPI spec](public/openapi.yaml), as a reference implementation on top of the same dataset. Most users don't need it: the static API and the npm package cover the same lookups without a server.
+## PHP library
 
 ```bash
-composer install
-composer db:setup                  # SQLite by default: runs the migrations and imports data/es_cp.csv
-php -S localhost:8000 -t public
-curl "http://localhost:8000/api/locations?provincia=sevilla&q=hermanas"
+composer require codecruz/spain-postal-codes
 ```
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/locations` | Paginated list. Filters: `provincia` (code or name, accents optional), `q` (town name), `page`, `limit` |
-| `GET /api/locations/{codPostal}` | Towns served by a postal code |
-| `GET /api/provinces` | Provinces with counts |
+```php
+use Codecruz\SpainPostalCodes\PostalCodes;
+
+PostalCodes::lookup('41700')[0]->nombre;       // "Dos Hermanas"
+PostalCodes::getProvincia('vizcaya')?->nombre; // "Bizkaia"
+PostalCodes::searchMunicipios('alcala');       // case- and accent-insensitive
+```
+
+It lives in its own repository, [codecruz/spain-postal-codes-php](https://github.com/codecruz/spain-postal-codes-php), because Packagist needs `composer.json` at the repository root. A workflow there pulls each new release of this dataset.
 
 ## Development
 
@@ -119,7 +118,6 @@ curl "http://localhost:8000/api/locations?provincia=sevilla&q=hermanas"
 data/                 Generated dataset (committed and versioned)
 scripts/              Dataset builder, static site builder and their tests (Python, stdlib only)
 packages/npm/         npm package (plain ESM + type definitions, no build step)
-src/, tests/          Symfony demo API
 ```
 
 ```bash
@@ -127,14 +125,13 @@ python3 scripts/build_dataset.py              # rebuild data/ from the latest IN
 python3 scripts/build_site.py                 # build the static API into site/
 python3 -m unittest discover -s scripts       # Python tests
 (cd packages/npm && npm test)                 # npm package tests
-composer test                                 # Symfony tests
 ```
 
 ### Automation
 
 | Workflow | What it does |
 |----------|--------------|
-| [`ci.yml`](.github/workflows/ci.yml) | Tests the Python scripts, the npm package (Node 18–22) and the Symfony app (PHP 8.2–8.4) |
+| [`ci.yml`](.github/workflows/ci.yml) | Tests the Python scripts and the npm package (Node 18–22) |
 | [`update-data.yml`](.github/workflows/update-data.yml) | After each INE release (February and August), rebuilds `data/` and opens a pull request with the changes |
 | [`pages.yml`](.github/workflows/pages.yml) | Deploys the static API to GitHub Pages when `data/` or `scripts/` change on `main` |
 | [`publish-npm.yml`](.github/workflows/publish-npm.yml) | Publishes the npm package when you create a release tagged `npm-v<version>` |
