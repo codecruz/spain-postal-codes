@@ -100,6 +100,13 @@ const { municipios } = await res.json();
 lookup("28001");             // [{ id: "28079", nombre: "Madrid", ... }]
 searchMunicipios("alcala");  // sin distinguir acentos ni mayúsculas</code></pre>
 
+  <h2>Librería PHP</h2>
+  <p>La misma API para PHP 8.1+, sin dependencias (<a href="https://github.com/codecruz/spain-postal-codes-php">código fuente</a>):</p>
+  <pre><code>composer require codecruz/spain-postal-codes</code></pre>
+  <pre><code>use Codecruz\SpainPostalCodes\PostalCodes;
+
+PostalCodes::lookup('28001')[0]-&gt;nombre;  // "Madrid"</code></pre>
+
   <h2>Descargas</h2>
   <ul>
     <li><a href="data/codigos_postales.csv">codigos_postales.csv</a>: <code>cod_postal, municipio_id, municipio, provincia_id, provincia</code> ({{ROWS}} filas)</li>
