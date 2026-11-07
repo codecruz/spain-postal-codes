@@ -3,8 +3,13 @@ framework:
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
 
-    # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    # Stateless JSON API: no sessions, no cookies.
+    session: false
+
+    # 4xx responses are client errors, not application errors: keep them out of the error log.
+    exceptions:
+        Symfony\Component\HttpKernel\Exception\HttpException:
+            log_level: info
 
     #esi: true
     #fragments: true
@@ -12,5 +17,3 @@ framework:
 when@test:
     framework:
         test: true
-        session:
-            storage_factory_id: session.storage.factory.mock_file

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Códigos postales de España</title>
+<meta name="description" content="Dataset abierto y API JSON estática de los códigos postales de España, generados a partir de datos oficiales del INE.">
+<style>
+  :root {
+    --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #5f6368; --border: #e3e1dc;
+    --accent: #b3261e; --accent-soft: #fbe9e7; --code-bg: #f3f1ed; --ok: #1e7d32;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141414; --surface: #1d1d1d; --text: #ececec; --muted: #a0a0a0; --border: #2f2f2f;
+      --accent: #ff8a80; --accent-soft: #3a1f1d; --code-bg: #232323; --ok: #81c784;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 860px; margin: 0 auto; padding: 48px 16px 64px; }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.02em; }
+  h2 { font-size: 1.25rem; margin: 48px 0 12px; }
+  p { margin: 0 0 12px; }
+  a { color: var(--accent); }
+  .lead { color: var(--muted); font-size: 1.1rem; max-width: 640px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 24px; margin: 28px 0 8px; }
+  .stat strong { display: block; font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: .9rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; }
+  input {
+    flex: 1 1 180px; font: inherit; font-size: 1.2rem; letter-spacing: .08em; padding: 10px 14px;
+    border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text);
+  }
+  button {
+    font: inherit; font-weight: 600; padding: 10px 18px; border: 0; border-radius: 8px;
+    background: var(--accent); color: var(--surface); cursor: pointer;
+  }
+  #result { margin-top: 16px; min-height: 1.6em; }
+  #result ul { margin: 0; padding-left: 20px; }
+  .muted { color: var(--muted); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; margin: 8px 0 16px; }
+  pre code { background: none; padding: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .table-wrap { overflow-x: auto; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Códigos postales de España</h1>
+  <p class="lead">Dataset abierto y API JSON estática, sin servidor ni claves. Generado a partir del Callejero del Censo Electoral del INE, actualizado a {{REFERENCE_DATE}}.</p>
+
+  <div class="stats">
+    <div class="stat"><strong>{{POSTAL_CODES}}</strong><span>códigos postales</span></div>
+    <div class="stat"><strong>{{MUNICIPALITIES}}</strong><span>municipios</span></div>
+    <div class="stat"><strong>52</strong><span>provincias</span></div>
+  </div>
+
+  <div class="card">
+    <form id="lookup">
+      <input id="cp" inputmode="numeric" pattern="\d{4,5}" maxlength="5" placeholder="28001" aria-label="Código postal" required>
+      <button type="submit">Buscar</button>
+    </form>
+    <div id="result" aria-live="polite"><span class="muted">Escribe un código postal de 5 dígitos.</span></div>
+  </div>
+
+  <h2>API</h2>
+  <p>Todas las rutas son ficheros JSON estáticos servidos por GitHub Pages, con CORS abierto. Un código o municipio inexistente devuelve <code>404</code>.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Ruta</th><th>Contenido</th></tr></thead>
+      <tbody>
+        <tr><td><a href="v1/cp/28001.json"><code>v1/cp/{cod_postal}.json</code></a></td><td>Municipios que sirve un código postal</td></tr>
+        <tr><td><a href="v1/municipios/28079.json"><code>v1/municipios/{id}.json</code></a></td><td>Un municipio (código INE) y sus códigos postales</td></tr>
+        <tr><td><a href="v1/municipios.json"><code>v1/municipios.json</code></a></td><td>Todos los municipios, útil para autocompletar</td></tr>
+        <tr><td><a href="v1/provincias.json"><code>v1/provincias.json</code></a></td><td>Las 52 provincias con sus totales</td></tr>
+        <tr><td><a href="v1/provincias/41.json"><code>v1/provincias/{id}.json</code></a></td><td>Una provincia con sus municipios y códigos</td></tr>
+        <tr><td><a href="v1/meta.json"><code>v1/meta.json</code></a></td><td>Periodo de los datos, licencia y totales</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <pre><code>const res = await fetch("https://codecruz.github.io/spain-postal-codes/v1/cp/41700.json");
+const { municipios } = await res.json();
+// [{ id: "41038", nombre: "Dos Hermanas", provincia_id: "41", provincia: "Sevilla" }]</code></pre>
+
+  <h2>Paquete npm</h2>
+  <p>Los mismos datos, empaquetados para usarlos sin red, en Node o en el navegador:</p>
+  <pre><code>npm install spain-postal-codes</code></pre>
+  <pre><code>import { lookup, searchMunicipios } from "spain-postal-codes";
+
+lookup("28001");             // [{ id: "28079", nombre: "Madrid", ... }]
+searchMunicipios("alcala");  // sin distinguir acentos ni mayúsculas</code></pre>
+
+  <h2>Descargas</h2>
+  <ul>
+    <li><a href="data/codigos_postales.csv">codigos_postales.csv</a>: <code>cod_postal, municipio_id, municipio, provincia_id, provincia</code> ({{ROWS}} filas)</li>
+    <li><a href="data/provincias.csv">provincias.csv</a></li>
+    <li><a href="data/metadata.json">metadata.json</a></li>
+  </ul>
+
+  <footer>
+    <p>{{ATTRIBUTION}} Periodo {{PERIOD}}. Datos bajo licencia <a href="https://creativecommons.org/licenses/by/4.0/deed.es">CC BY 4.0</a>; código bajo licencia MIT.</p>
+    <p>Proyecto no oficial: los códigos postales son los que constan en el callejero del INE para cada calle, sin incluir los que no corresponden a una dirección (apartados de correos, grandes clientes). <a href="https://github.com/codecruz/spain-postal-codes">Código fuente y avisos de errores en GitHub</a>.</p>
+  </footer>
+</main>
+<script>
+  const form = document.getElementById("lookup");
+  const input = document.getElementById("cp");
+  const result = document.getElementById("result");
+
+  function show(nodes) { result.replaceChildren(...nodes); }
+  function text(content, className) {
+    const el = document.createElement("span");
+    el.textContent = content;
+    if (className) el.className = className;
+    return el;
+  }
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    let cp = input.value.trim();
+    if (/^\d{4}$/.test(cp)) cp = "0" + cp;
+    if (!/^\d{5}$/.test(cp)) { show([text("El código postal debe tener 5 dígitos.", "muted")]); return; }
+
+    show([text("Buscando…", "muted")]);
+    try {
+      const res = await fetch(`v1/cp/${cp}.json`);
+      if (res.status === 404) { show([text(`No hay ningún municipio con el código ${cp}.`, "muted")]); return; }
+      if (!res.ok) throw new Error(res.statusText);
+      const { municipios } = await res.json();
+      const list = document.createElement("ul");
+      for (const m of municipios) {
+        const li = document.createElement("li");
+        li.textContent = `${m.nombre} (${m.provincia})`;
+        list.append(li);
+      }
+      show([list]);
+    } catch (error) {
+      show([text("No se pudo consultar la API. Inténtalo de nuevo.", "muted")]);
+    }
+  });
+</script>
+</body>
+</html>

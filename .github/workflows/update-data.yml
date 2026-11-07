@@ -1,0 +1,45 @@
+name: Update dataset from INE
+
+# The INE publishes the Callejero del Censo Electoral every January and July.
+on:
+  schedule:
+    - cron: '0 6 1 2,3,8,9 *'
+  workflow_dispatch:
+    inputs:
+      period:
+        description: 'Callejero period as MMYYYY (e.g. 012027). Empty = latest.'
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Rebuild dataset
+        id: build
+        run: |
+          python scripts/build_dataset.py ${{ inputs.period && format('--period {0}', inputs.period) || '' }}
+          python -m unittest discover -s scripts
+          echo "period=$(python -c 'import json; print(json.load(open("data/metadata.json"))["source"]["period"])')" >> "$GITHUB_OUTPUT"
+          git diff --stat -- data
+
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: data/ine-${{ steps.build.outputs.period }}
+          commit-message: 'data: update to INE callejero ${{ steps.build.outputs.period }}'
+          title: 'data: update to INE callejero ${{ steps.build.outputs.period }}'
+          body: |
+            Automatic update of `data/` from the INE Callejero del Censo Electoral (period ${{ steps.build.outputs.period }}).
+
+            Review the diff and `data/metadata.json` (counts and discarded pairs) before merging.
+            After merging, publish a new npm version so the package picks up the data.
+          add-paths: data/
+          delete-branch: true

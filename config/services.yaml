@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.dataset_path: '%kernel.project_dir%/data/es_cp.csv'
 
 services:
     # default configuration for services in *this* file
@@ -16,8 +17,10 @@ services:
     App\:
         resource: '../src/'
         exclude:
+            - '../src/Data/'
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Http/'
             - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed

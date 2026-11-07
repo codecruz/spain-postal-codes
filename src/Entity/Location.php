@@ -1,67 +1,71 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\LocationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * A town (población) served by a postal code within a province.
+ *
+ * A postal code may cover several towns and a town may have several postal
+ * codes, so each row is a unique (province, town, postal code) triple.
+ */
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
-class Location
+#[ORM\Table(name: 'location')]
+#[ORM\Index(name: 'idx_location_cod_postal', columns: ['cod_postal'])]
+#[ORM\UniqueConstraint(name: 'uniq_location', columns: ['provincia', 'poblacion', 'cod_postal'])]
+class Location implements \JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $provincia = null;
+    public function __construct(
+        #[ORM\Column(length: 100)]
+        private string $provincia,
 
-    #[ORM\Column(length: 255)]
-    private ?string $poblacion = null;
+        #[ORM\Column(length: 150)]
+        private string $poblacion,
 
-    #[ORM\Column]
-    private ?float $cod_postal = null;
-
+        /** Always 5 digits, keeping the leading zero (e.g. "01450"). */
+        #[ORM\Column(name: 'cod_postal', length: 5, options: ['fixed' => true])]
+        private string $codPostal,
+    ) {
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProvincia(): ?string
+    public function getProvincia(): string
     {
         return $this->provincia;
     }
 
-    public function setProvincia(string $provincia): static
-    {
-        $this->provincia = $provincia;
-
-        return $this;
-    }
-
-    public function getPoblacion(): ?string
+    public function getPoblacion(): string
     {
         return $this->poblacion;
     }
 
-    public function setPoblacion(string $poblacion): static
+    public function getCodPostal(): string
     {
-        $this->poblacion = $poblacion;
-
-        return $this;
+        return $this->codPostal;
     }
 
-    public function getCodPostal(): ?int
+    /**
+     * @return array{provincia: string, poblacion: string, cod_postal: string}
+     */
+    public function jsonSerialize(): array
     {
-        return $this->cod_postal;
+        return [
+            'provincia' => $this->provincia,
+            'poblacion' => $this->poblacion,
+            'cod_postal' => $this->codPostal,
+        ];
     }
-
-    public function setCodPostal(int $cod_postal): static
-    {
-        $this->cod_postal = $cod_postal;
-
-        return $this;
-    }
-
 }
