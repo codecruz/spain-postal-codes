@@ -1,0 +1,48 @@
+{
+  "name": "spain-postal-codes",
+  "version": "1.0.0",
+  "description": "Spanish postal codes, municipalities and provinces from official INE data. Offline lookup, zero dependencies.",
+  "keywords": [
+    "spain",
+    "españa",
+    "postal-code",
+    "codigo-postal",
+    "zip-code",
+    "municipios",
+    "provincias",
+    "ine"
+  ],
+  "homepage": "https://codecruz.github.io/spain-postal-codes/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codecruz/spain-postal-codes.git",
+    "directory": "packages/npm"
+  },
+  "bugs": "https://github.com/codecruz/spain-postal-codes/issues",
+  "license": "MIT",
+  "author": "codecruz (https://github.com/codecruz)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "data.js",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node scripts/build-data.mjs",
+    "test": "node scripts/build-data.mjs && node --test",
+    "prepack": "node scripts/build-data.mjs"
+  }
+}
