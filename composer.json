@@ -1,24 +1,37 @@
 {
-    "name": "symfony/skeleton",
+    "name": "codecruz/spain-postal-codes",
     "type": "project",
-    "license": "proprietary",
-    "description": "A minimal Symfony project recommended to create bare bones applications",
+    "description": "REST API and open dataset of Spanish postal codes, towns and provinces, built with Symfony.",
+    "keywords": ["spain", "postal-codes", "codigos-postales", "api", "symfony", "dataset"],
+    "homepage": "https://github.com/codecruz/spain-postal-codes",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "codecruz",
+            "homepage": "https://github.com/codecruz"
+        }
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/dbal": "^3",
-        "doctrine/doctrine-bundle": "^2.12",
+        "doctrine/dbal": "^3.8",
+        "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.3",
-        "doctrine/orm": "^3.1",
-        "symfony/console": "7.0.*",
-        "symfony/dotenv": "7.0.*",
+        "doctrine/orm": "^3.3",
+        "symfony/console": "7.4.*",
+        "symfony/dotenv": "7.4.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "7.0.*",
-        "symfony/runtime": "7.0.*",
-        "symfony/yaml": "7.0.*"
+        "symfony/framework-bundle": "7.4.*",
+        "symfony/runtime": "7.4.*",
+        "symfony/yaml": "7.4.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "symfony/browser-kit": "7.4.*",
+        "symfony/maker-bundle": "^1.61"
     },
     "config": {
         "allow-plugins": {
@@ -58,7 +71,17 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "db:setup": [
+            "@php bin/console doctrine:database:create --if-not-exists --no-interaction",
+            "@php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration",
+            "@php bin/console app:locations:import"
+        ],
+        "test": "@php vendor/bin/phpunit"
+    },
+    "scripts-descriptions": {
+        "db:setup": "Create the database, run the migrations and import the postal code dataset.",
+        "test": "Run the test suite."
     },
     "conflict": {
         "symfony/symfony": "*"
@@ -66,10 +89,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.0.*"
+            "require": "7.4.*"
         }
-    },
-    "require-dev": {
-        "symfony/maker-bundle": "^1.59"
     }
 }
