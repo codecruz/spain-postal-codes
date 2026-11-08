@@ -1,6 +1,6 @@
 {
   "name": "spain-postal-codes",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Spanish postal codes, municipalities and provinces from official INE data. Offline lookup, zero dependencies.",
   "keywords": [
     "spain",
