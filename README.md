@@ -136,6 +136,43 @@ python3 -m unittest discover -s scripts       # Python tests
 | [`pages.yml`](.github/workflows/pages.yml) | Deploys the static API to GitHub Pages when `data/` or `scripts/` change on `main` |
 | [`publish-npm.yml`](.github/workflows/publish-npm.yml) | Publishes the npm package when you create a release tagged `npm-v<version>`, using npm Trusted Publishing (no token stored) |
 
+### Releasing
+
+#### Versioning
+
+The packages follow [Semantic Versioning](https://semver.org/):
+
+| Change | Version bump |
+|--------|--------------|
+| Bug fixes in lookups or search | **patch** |
+| New INE data | **minor** |
+| New functions or options | **minor** |
+| Removed or renamed functions, changed return shapes | **major** |
+
+The npm package and the [PHP library](https://github.com/codecruz/spain-postal-codes-php) are versioned separately, but each data update should be released on both.
+
+#### Updating the data (each INE release)
+
+1. In February and August, `update-data.yml` opens a pull request titled `data: update to INE callejero <period>`. You can also start it by hand from the **Actions** tab (*Update dataset from INE → Run workflow*), with an optional period such as `012027`.
+2. Review the diff and `data/metadata.json`. Check that the counts are close to the previous ones and look at the `discarded` pairs.
+3. Merge it. `pages.yml` deploys the new static API in about a minute.
+4. Release the npm package (below) and the PHP library with the new data.
+
+#### Publishing the npm package
+
+1. Bump the version in `packages/npm/package.json` (for example with `cd packages/npm && npm version minor --no-git-tag-version`), commit it in a pull request and merge it into `main`.
+2. Create a GitHub release on `main` whose tag is `npm-v` plus that version:
+
+   ```bash
+   gh release create npm-v1.1.0 --target main --title "npm v1.1.0" --notes "Data: INE callejero 2027-01"
+   ```
+
+3. `publish-npm.yml` checks that the tag matches the version, runs the tests and publishes with provenance. Check the run under **Actions**. The new version shows up on [npm](https://www.npmjs.com/package/spain-postal-codes) within a few minutes.
+
+npm only accepts this workflow (Trusted Publishing) or a manual `npm publish` confirmed with 2FA: tokens are disabled for the package. If the workflow fails at `npm publish` with an authentication error, check the trusted publisher with `npm trust list spain-postal-codes`.
+
+A published version can't be republished. To fix a bad release, publish a new patch version. Use `npm deprecate spain-postal-codes@<version> "<reason>"` to warn users away from the bad one.
+
 ## Contributing
 
 The data comes from the INE, so the dataset files shouldn't be edited by hand. If you find a wrong or missing postal code:
