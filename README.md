@@ -134,7 +134,7 @@ python3 -m unittest discover -s scripts       # Python tests
 | [`ci.yml`](.github/workflows/ci.yml) | Tests the Python scripts and the npm package (Node 18–22) |
 | [`update-data.yml`](.github/workflows/update-data.yml) | After each INE release (February and August), rebuilds `data/` and opens a pull request with the changes |
 | [`pages.yml`](.github/workflows/pages.yml) | Deploys the static API to GitHub Pages when `data/` or `scripts/` change on `main` |
-| [`publish-npm.yml`](.github/workflows/publish-npm.yml) | Publishes the npm package when you create a release tagged `npm-v<version>` |
+| [`publish-npm.yml`](.github/workflows/publish-npm.yml) | Publishes the npm package when you create a release tagged `npm-v<version>`, using npm Trusted Publishing (no token stored) |
 
 ## Contributing
 
