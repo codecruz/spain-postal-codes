@@ -4,7 +4,52 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Códigos postales de España</title>
-<meta name="description" content="Dataset abierto y API JSON estática de los códigos postales de España, generados a partir de datos oficiales del INE.">
+<meta name="description" content="Dataset abierto y API JSON estática de los códigos postales de España, generados a partir de datos oficiales del INE: {{POSTAL_CODES}} códigos postales y {{MUNICIPALITIES}} municipios. También en npm y para PHP.">
+<link rel="canonical" href="https://codecruz.github.io/spain-postal-codes/">
+<meta name="theme-color" content="#b3261e">
+<meta property="og:title" content="Códigos postales de España">
+<meta property="og:description" content="Dataset abierto, API JSON estática, npm y PHP, con datos oficiales del INE: {{POSTAL_CODES}} códigos postales, {{MUNICIPALITIES}} municipios y 52 provincias.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://codecruz.github.io/spain-postal-codes/">
+<meta property="og:site_name" content="spain-postal-codes">
+<meta property="og:locale" content="es_ES">
+<meta property="og:image" content="https://codecruz.github.io/spain-postal-codes/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Códigos postales de España: dataset abierto con datos del INE y un ejemplo de la API JSON">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Códigos postales de España">
+<meta name="twitter:description" content="Dataset abierto, API JSON estática, npm y PHP, con datos oficiales del INE.">
+<meta name="twitter:image" content="https://codecruz.github.io/spain-postal-codes/assets/og-image.png">
+<meta name="twitter:image:alt" content="Códigos postales de España: dataset abierto con datos del INE y un ejemplo de la API JSON">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Códigos postales de España",
+  "description": "Códigos postales de España y los municipios a los que sirven, con los códigos oficiales del INE. Generado a partir del Callejero del Censo Electoral y la Relación de municipios del Instituto Nacional de Estadística. No incluye apartados de correos ni códigos de grandes clientes.",
+  "url": "https://codecruz.github.io/spain-postal-codes/",
+  "sameAs": "https://github.com/codecruz/spain-postal-codes",
+  "keywords": ["códigos postales", "España", "municipios", "provincias", "INE", "datos abiertos"],
+  "inLanguage": "es",
+  "isAccessibleForFree": true,
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "creator": { "@type": "Person", "name": "codecruz", "url": "https://github.com/codecruz" },
+  "isBasedOn": "https://www.ine.es/dyngs/DAB/es/index.htm?cid=1390",
+  "spatialCoverage": { "@type": "Place", "name": "España" },
+  "temporalCoverage": "{{REFERENCE_DATE}}",
+  "dateModified": "{{REFERENCE_DATE}}",
+  "variableMeasured": ["cod_postal", "municipio_id", "municipio", "provincia_id", "provincia"],
+  "distribution": [
+    { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://codecruz.github.io/spain-postal-codes/data/codigos_postales.csv" },
+    { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "https://codecruz.github.io/spain-postal-codes/data/provincias.csv" },
+    { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "https://codecruz.github.io/spain-postal-codes/v1/provincias.json" }
+  ]
+}
+</script>
 <style>
   :root {
     --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #5f6368; --border: #e3e1dc;

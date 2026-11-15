@@ -4,6 +4,8 @@
 Layout of the generated site:
 
     index.html                     documentation and live lookup
+    assets/                        share image and icons (tools/make_assets.py)
+    sitemap.xml                    for search engines
     v1/meta.json                   source period, license and counts
     v1/cp/{cod_postal}.json        municipalities served by a postal code
     v1/municipios.json             every municipality (id, name, province)
@@ -28,6 +30,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE = Path(__file__).resolve().parent / "templates" / "index.html"
+ASSETS = TEMPLATE.parent / "assets"
+SITE_URL = "https://codecruz.github.io/spain-postal-codes/"
 
 
 def write_json(path: Path, payload: object) -> None:
@@ -103,6 +107,17 @@ def build(data_dir: Path, out_dir: Path) -> dict:
         page = page.replace("{{" + key + "}}", html.escape(str(value)))
     (out_dir / "index.html").write_text(page, encoding="utf-8")
     (out_dir / ".nojekyll").write_text("", encoding="utf-8")  # serve files as-is
+
+    # Share image and icons, made by tools/make_assets.py.
+    shutil.copytree(ASSETS, out_dir / "assets")
+    # No robots.txt: on a project site crawlers only read the one at the domain root.
+    (out_dir / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"  <url><loc>{SITE_URL}</loc><lastmod>{metadata['source']['reference_date']}</lastmod></url>\n"
+        "</urlset>\n",
+        encoding="utf-8",
+    )
 
     return {"postal_codes": len(by_cp), "municipalities": len(municipalities)}
 
