@@ -117,6 +117,8 @@ It lives in its own repository, [codecruz/spain-postal-codes-php](https://github
 ```
 data/                 Generated dataset (committed and versioned)
 scripts/              Dataset builder, static site builder and their tests (Python, stdlib only)
+scripts/templates/    The site page and its share image and icons (assets/)
+tools/                make_assets.py, which draws the share image and icons
 packages/npm/         npm package (plain ESM + type definitions, no build step)
 ```
 
@@ -125,7 +127,10 @@ python3 scripts/build_dataset.py              # rebuild data/ from the latest IN
 python3 scripts/build_site.py                 # build the static API into site/
 python3 -m unittest discover -s scripts       # Python tests
 (cd packages/npm && npm test)                 # npm package tests
+python3 tools/make_assets.py                  # redraw the share image and icons (needs Chrome and Pillow)
 ```
+
+The share image shows the counts from `data/metadata.json`. If a data update changes them, run `tools/make_assets.py` again and commit the new images.
 
 ### Automation
 
