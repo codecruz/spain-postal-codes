@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/codecruz/spain-postal-codes/actions/workflows/ci.yml/badge.svg)](https://github.com/codecruz/spain-postal-codes/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/spain-postal-codes.svg)](https://www.npmjs.com/package/spain-postal-codes)
+[![npm downloads](https://img.shields.io/npm/dm/spain-postal-codes.svg)](https://www.npmjs.com/package/spain-postal-codes)
 [![Data: CC BY 4.0](https://img.shields.io/badge/data-CC%20BY%204.0-green.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 
